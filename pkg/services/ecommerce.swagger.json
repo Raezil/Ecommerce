@@ -1,0 +1,243 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ecommerce.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Ecommerce"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/orders": {
+      "post": {
+        "summary": "CreateOrder creates a new order.",
+        "operationId": "Ecommerce_CreateOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ecommerceCreateOrderResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ecommerceCreateOrderRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Ecommerce"
+        ]
+      }
+    },
+    "/v1/products": {
+      "get": {
+        "summary": "ListProducts returns all products.",
+        "operationId": "Ecommerce_ListProducts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ecommerceListProductsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Ecommerce"
+        ]
+      }
+    },
+    "/v1/products/{id}": {
+      "get": {
+        "summary": "GetProduct returns a specific product.",
+        "operationId": "Ecommerce_GetProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ecommerceGetProductResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Ecommerce"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ecommerceCreateOrderRequest": {
+      "type": "object",
+      "properties": {
+        "productIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "userId": {
+          "type": "string",
+          "description": "Identify the user who is creating the order."
+        }
+      }
+    },
+    "ecommerceCreateOrderResponse": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "$ref": "#/definitions/ecommerceOrder"
+        }
+      }
+    },
+    "ecommerceCustomer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "title": "Add additional fields as required (e.g., address, phone, etc.)"
+        }
+      },
+      "description": "User represents a customer in the e-commerce system."
+    },
+    "ecommerceGetProductResponse": {
+      "type": "object",
+      "properties": {
+        "product": {
+          "$ref": "#/definitions/ecommerceProduct"
+        }
+      }
+    },
+    "ecommerceListProductsResponse": {
+      "type": "object",
+      "properties": {
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ecommerceProduct"
+          }
+        }
+      },
+      "title": "Response messages"
+    },
+    "ecommerceOrder": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "productIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of product IDs for the items in the order."
+        },
+        "status": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the user placing the order."
+        },
+        "customer": {
+          "$ref": "#/definitions/ecommerceCustomer",
+          "description": "Optionally include the full user data if needed."
+        }
+      },
+      "description": "Order represents a customer's order."
+    },
+    "ecommerceProduct": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "description": "Product represents an item available for purchase."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

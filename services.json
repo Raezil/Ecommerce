@@ -1,0 +1,14 @@
+[
+  {
+    "ServiceName": "Auth",
+    "ServiceStruct": "AuthServiceServer",
+    "ServiceRegister": "RegisterAuthServer",
+    "HandlerRegister": "RegisterAuthHandler"
+  },
+  {
+    "ServiceName": "Ecommerce",
+    "ServiceStruct": "EcommerceServiceServer",
+    "ServiceRegister": "RegisterEcommerceServer",
+    "HandlerRegister": "RegisterEcommerceHandler"
+  }
+]
