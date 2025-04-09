@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package ecommerce;
+
+option go_package = "./pkg/services/generated";
+
+import "google/api/annotations.proto";
+
+message ChatMessage {
+  string user_id = 1;
+  string message = 2;
+  int64 timestamp = 3; // e.g., Unix timestamp
+}
+
+service Chat {
+  rpc ChatStream (stream ChatMessage) returns (stream ChatMessage);
+}

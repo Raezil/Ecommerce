@@ -13,6 +13,7 @@ import (
 
 	. "routes"
 
+	"github.com/fasthttp/websocket"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/opentracing/opentracing-go"
 	"github.com/spf13/viper"
@@ -24,6 +25,64 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
+
+// Configure an upgrader.
+var upgrader = websocket.FastHTTPUpgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(ctx *fasthttp.RequestCtx) bool {
+		// For testing, accept any origin.
+		// In production, validate the origin as needed.
+		return true
+	},
+}
+
+func wsHandler(ctx *fasthttp.RequestCtx) {
+	err := upgrader.Upgrade(ctx, func(conn *websocket.Conn) {
+		defer conn.Close()
+
+		for {
+			// Read a message from the WebSocket connection.
+			messageType, message, err := conn.ReadMessage()
+			if err != nil {
+				log.Printf("Error reading message: %v", err)
+				break
+			}
+			log.Printf("Received message: %s", message)
+
+			// Echo the message back to the client.
+			if err := conn.WriteMessage(messageType, message); err != nil {
+				log.Printf("Error writing message: %v", err)
+				break
+			}
+		}
+	})
+	if err != nil {
+		log.Printf("WebSocket upgrade failed: %v", err)
+		ctx.Error("WebSocket upgrade failed", fasthttp.StatusBadRequest)
+	}
+}
+
+func handleConnection(conn *websocket.Conn) {
+	defer conn.Close()
+	// Here, we run a simple echo loop.
+	for {
+		// Read a message (message type and the data).
+		messageType, message, err := conn.ReadMessage()
+		if err != nil {
+			// Log error and break on error (client may have disconnected).
+			break
+		}
+		// Process the message; here, we simply log it.
+		log.Printf("Received: %s", message)
+
+		// Write the message back (echo it).
+		err = conn.WriteMessage(messageType, message)
+		if err != nil {
+			break
+		}
+	}
+}
 
 func initConfig() {
 	viper.SetDefault("grpc.port", ":50051")
@@ -115,6 +174,13 @@ func (app *App) RegisterMux() fasthttp.RequestHandler {
 			healthCheckHandler(ctx)
 		case "/ready":
 			readyCheckHandler(ctx)
+		case "/ws":
+			// Handle WebSocket upgrade.
+			if err := upgrader.Upgrade(ctx, func(conn *websocket.Conn) {
+				handleConnection(conn)
+			}); err != nil {
+				ctx.Error("WebSocket upgrade failed", fasthttp.StatusBadRequest)
+			}
 		default:
 			fasthttpHandler(ctx) // Pass other requests to gRPC-Gateway
 		}

@@ -10,5 +10,10 @@
     "ServiceStruct": "EcommerceServiceServer",
     "ServiceRegister": "RegisterEcommerceServer",
     "HandlerRegister": "RegisterEcommerceHandler"
-  }
+  },
+  {
+    "ServiceName": "Chat",
+    "ServiceStruct": "ChatServiceServer",
+    "ServiceRegister": "RegisterChatServer"
+    }
 ]
