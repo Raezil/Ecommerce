@@ -131,10 +131,13 @@ func (hub *ChatHub) ServeWs(ctx *fasthttp.RequestCtx) {
 				break
 			}
 
-			log.Printf("WS Received message: %v", msg)
+			// Log the full struct to see if fields are populated.
+			log.Printf("WS Received message struct: %+v", msg)
+
 			// Broadcast the received message to all clients.
 			hub.broadcast <- &msg
 		}
+
 	})
 
 	if err != nil {

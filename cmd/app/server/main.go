@@ -175,12 +175,7 @@ func (app *App) RegisterMux() fasthttp.RequestHandler {
 		case "/ready":
 			readyCheckHandler(ctx)
 		case "/ws":
-			// Handle WebSocket upgrade.
-			if err := upgrader.Upgrade(ctx, func(conn *websocket.Conn) {
-				handleConnection(conn)
-			}); err != nil {
-				ctx.Error("WebSocket upgrade failed", fasthttp.StatusBadRequest)
-			}
+			wsHandler(ctx)
 		default:
 			fasthttpHandler(ctx) // Pass other requests to gRPC-Gateway
 		}
