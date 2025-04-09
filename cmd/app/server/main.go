@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"services"
 	"syscall"
 	"time"
 
@@ -167,6 +168,7 @@ func (app *App) RegisterMux() fasthttp.RequestHandler {
 		ctx.SetBody([]byte("Ready"))
 	}
 
+	hub := services.NewChatHub()
 	// Create a FastHTTP router.
 	fastMux := middlewares.CORSMiddleware(middlewares.LoggingMiddleware(func(ctx *fasthttp.RequestCtx) {
 		switch string(ctx.Path()) {
@@ -175,7 +177,7 @@ func (app *App) RegisterMux() fasthttp.RequestHandler {
 		case "/ready":
 			readyCheckHandler(ctx)
 		case "/ws":
-			wsHandler(ctx)
+			hub.ServeWs(ctx)
 		default:
 			fasthttpHandler(ctx) // Pass other requests to gRPC-Gateway
 		}
